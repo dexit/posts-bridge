@@ -427,8 +427,6 @@ class REST_Settings_Controller extends Base_Controller {
 
 		$introspection_data = array( 'backend' => $backend );
 
-		Backend::temp_registration( $backend );
-
 		$credential = $request['credential'];
 		if ( ! empty( $credential ) ) {
 			$credential = wpct_plugin_sanitize_with_schema(
@@ -440,9 +438,8 @@ class REST_Settings_Controller extends Base_Controller {
 				return self::bad_request();
 			}
 
-			Credential::temp_registration( $credential );
-			$backend['credential'] = $credential['name'];
-
+			$backend['credential']            = $credential['name'];
+			$introspection_data['backend']    = $backend;
 			$introspection_data['credential'] = $credential;
 		} elseif ( ! empty( $backend['credential'] ) ) {
 			$credential = PBAPI::get_credential( $backend['credential'] );
@@ -451,6 +448,9 @@ class REST_Settings_Controller extends Base_Controller {
 				$introspection_data['credential'] = $credential->data();
 			}
 		}
+
+		Backend::temp_registration( $backend );
+		Credential::temp_registration( $credential );
 
 		self::$introspection_data = wp_json_encode( $introspection_data );
 		return array( $addon, $backend['name'] );
