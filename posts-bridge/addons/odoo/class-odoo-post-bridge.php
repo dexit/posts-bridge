@@ -177,6 +177,10 @@ class Odoo_Post_Bridge extends Post_Bridge {
 	 * @return array{0:string, 1:integer, 2:string}|WP_Error
 	 */
 	public function login() {
+		if ( self::$session ) {
+			return self::$session;
+		}
+
 		if ( ! $this->is_valid ) {
 			return new WP_Error( 'invalid_bridge', 'Bridge is invalid', (array) $this->data );
 		}
